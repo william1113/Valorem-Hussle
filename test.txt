@@ -1,0 +1,23 @@
+{"Apple iPhone 12 Mini, 64GB, Svart (Renoverad)": "5 19900 kr", 
+"Apple iPhone 12 Pro Max, 128GB, Pacific Bl\u00e5 (Renoverad)": "7 88000 kr", 
+"Apple iPhone XS Max, 128 GB (Renoverad)": "3 41971 kr", 
+"Apple iPhone 12 (64\u00a0GB) - gr\u00f6n": "7 99000 kr", 
+"Google Pixel 6A - Smartphone 128GB, 6GB RAM, Dual Sim, Chalk White": "4 49000 kr", 
+"Apple iPhone 14 128GB Midnight (Renoverad)": "10 21900 kr", 
+"Google Pixel 6a G1AZG Smartphone, M\u00f6rkgr\u00e5": "4 44000 kr", 
+"Apple iPhone 14 Pro (128 GB) - silver": "13 49000 kr", 
+"Apple iPhone 12 Pro, 128GB, Pacific Bl\u00e5 (Renoverad)": "8 39900 kr"}
+
+
+{"Apple iPhone 12 Mini, 64GB, Svart (Renoverad)": "5 19900 kr", 
+"Apple iPhone 12 Pro Max, 128GB, Pacific Bl\u00e5 (Renoverad)": "7 88000 kr", 
+"Apple iPhone XS Max, 128 GB (Renoverad)": "3 41971 kr", 
+"Apple iPhone 12 (64\u00a0GB) - gr\u00f6n": "7 99000 kr", 
+"Google Pixel 6A - Smartphone 128GB, 6GB RAM, Dual Sim, Chalk White": "4 49000 kr", 
+"Apple iPhone 14 128GB Midnight (Renoverad)": "10 21900 kr", 
+"Google Pixel 6a G1AZG Smartphone, M\u00f6rkgr\u00e5": "4 44000 kr", 
+"Apple iPhone 14 Pro (128 GB) - silver": "13 49000 kr", 
+"Apple iPhone 12 Pro, 128GB, Pacific Bl\u00e5 (Renoverad)": "8 39900 kr"}
+
+
+
