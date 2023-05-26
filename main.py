@@ -16,31 +16,22 @@ app.secret_key = config['SECRET_KEY']
 
 #----------------------------------------------------------------
 
-
-
-
-def remove_non_ascii(text):
-    return text.encode().decode('unicode_escape')
-
-
+@app.route("/results", methods=["GET", "POST"])
+def results():
+    return render_template("results.html", data=session["data"], search_query=session["search_query"])
     
-@app.route("/", methods = ["POST", "GET"])
-def index(): # inialtzes the front page also called the home page
+@app.route("/", methods=["POST", "GET"])
+def index():
     return render_template("index.html")
 
-@app.route("/results", methods = ["POST"])
+@app.route("/search", methods=["POST"])
 def search():
     search_query = request.form['search_query']
     data = graber(search_query)
- 
+    session["data"] = data
+    session["search_query"] = search_query
     
-    return render_template("results.html", data=data, search_query=search_query)    
-
-
-@app.route("/results", methods=["GET", "POST"])
-def results():
-    return render_template("results.html")
-
+    return redirect(url_for("results"))
 
 
 page1 = Pages(app, 'kjell', "store1.html")

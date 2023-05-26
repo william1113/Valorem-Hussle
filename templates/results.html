@@ -19,12 +19,16 @@
     </style>
 </head>
 <body>
-    <div id="SearchTitle">
-        <h2>{{ search_query }}</h2>
-    </div>
     <div id="messageContainer">
-        {{data}}
-    </div>
+        {% for item in data %}
+          <div class="item">
+            {% for key, value in item.items() %}
+              <p class="name">{{ key|safe }}</p>
+              <p class="price">{{ value|safe }}</p>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
 
 
 </body>
