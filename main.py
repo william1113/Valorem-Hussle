@@ -1,5 +1,6 @@
 import json
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, redirect, render_template, url_for, request, session 
+from flask_session import Session
 
 from tools.dbManger import DBManger
 from tools.webscraper import graber
@@ -12,6 +13,8 @@ with open ("config.json", "r") as config_file:
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = config["dbURL"]
 app.secret_key = config['SECRET_KEY']
+
+
 #db_manager = DBManger()
 
 #----------------------------------------------------------------
@@ -22,6 +25,8 @@ def results():
     
 @app.route("/", methods=["POST", "GET"])
 def index():
+    for key in list(session.keys()):
+        print(key)
     return render_template("index.html")
 
 @app.route("/search", methods=["POST"])

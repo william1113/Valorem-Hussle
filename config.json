@@ -1,6 +1,6 @@
 {
-    "dbURL": "sqlite:///userdata.db",
     "SECRET_KEY": "u+3tknB8M>]-}@K3)8o=5m#rGH-jt@j.k8qk,V%Vzn%vo4m^:C!CbXCo7k%R*ek.0nEoydhMt}g7M?3GZ#,5}Ezprx5z1impcg,-",
+    "dbURL": "sqlite:///userdata.db",
     "count": 50
 
 }
