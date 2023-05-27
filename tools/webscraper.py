@@ -48,7 +48,6 @@ def graber(search):
             continue
         break
         #print(price.text)
-    products = unicodeChanger(products)
-    #print(products)
+
     return unicodeChanger(products)
   
