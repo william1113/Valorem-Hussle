@@ -1,11 +1,11 @@
 import json
 
 from flask import Flask, redirect, render_template, request, session, url_for
-from flask_login import LoginManager, login_required, login_user, logout_user
+from flask_login import LoginManager, login_required, current_user, logout_user, login_user
 
 from flask_session import Session
 from storePages import Pages
-from tools.dbManger import DBManger, User
+from tools.dbManger import DBManager, User
 from tools.findNums import findNumsInString
 from tools.webscraper import graber
 
@@ -28,7 +28,11 @@ login_manager.init_app(app)
 Session(app)
 
 # Create an instance of the DBManager
-db_manager = DBManger()
+db_manager = DBManager()
+
+@app.errorhandler(401)
+def unauthorized(error):
+    return render_template('unauthorized.html'), 401
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -45,13 +49,14 @@ def index():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     db_manager.addUserToDB()
+        
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
 
         user = User.query.filter_by(email=email).first()
         if db_manager.checkPassword(email, password):
-            login_user(user)
+            login_user(user)  # Add this line to log in the user
             return redirect(url_for("index"))
         else:
             return "Invalid email or password"
@@ -65,6 +70,7 @@ def logout():
     return redirect(url_for("login"))
 
 @app.route("/results/", methods=["GET", "POST"])
+
 @login_required
 def results():
     search_query = findNumsInString(request.args.get("search_query"))
@@ -87,7 +93,7 @@ def search():
     return redirect(url_for("results", search_query=search_query))
   else:
       return "404"
-
+  
 # Create the store page
 Pages(app, 'kjell', "store1.html").createPage()
 
