@@ -4,7 +4,7 @@ from flask import Flask, redirect, render_template, request, session, url_for
 from flask_login import LoginManager, login_required, logout_user, login_user
 
 from flask_session import Session
-from storePages import Pages
+from tools.storePages import Pages
 from tools.dbManger import DBManager, User
 from tools.webscraper import graber
 
