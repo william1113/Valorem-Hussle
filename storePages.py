@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import render_template
 
 class Pages:
     def __init__(self, app,name, htmlFile):
