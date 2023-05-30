@@ -1,9 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
-import pandas as pd
 import json 
 import re
-
 
 def unicodeChanger(arg):
     for index, indexValue in enumerate(arg):
@@ -23,7 +21,7 @@ def unicodeChanger(arg):
     return arg 
 
 def graber(search):
-    
+
     search_engine_url = "https://www.amazon.se/s?k="  # Replace with the appropriate search engine URL
     url = search_engine_url + search
 
@@ -50,4 +48,4 @@ def graber(search):
         #print(price.text)
 
     return unicodeChanger(products)
-  
+    

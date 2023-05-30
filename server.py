@@ -5,7 +5,7 @@ from flask_login import LoginManager, login_required, logout_user, login_user
 
 from flask_session import Session
 from tools.storePages import Pages
-from tools.dbManger import DBManager, User
+from tools.dbManger import DBManager, User, Company, db
 from tools.webscraper import graber
 
 app = Flask(__name__)
@@ -37,7 +37,7 @@ def unauthorized(error):
 #loads the user through user id
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 #main page for website
 @app.route("/", methods=["POST", "GET"])
@@ -59,6 +59,10 @@ def login():
         password = request.form["password"]
 
         user = User.query.filter_by(email=email).first()
+        if user is None:
+            user = Company.query.filter_by(email=email).first()
+        
+        
         if db_manager.checkPassword(email, password, User):
             login_user(user)  # Add this line to log in the user
             return redirect(url_for("index"))

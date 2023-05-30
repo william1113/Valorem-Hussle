@@ -28,6 +28,8 @@ class Company(db.Model, UserMixin):
     
     companyName = db.Column(db.String(50))
     owner = db.Column(db.String(50))
+    
+    activity = db.Column(db.Integer)
 
 # all the database tools
 class DBManager:
@@ -39,6 +41,7 @@ class DBManager:
     
             
     def addUserToDB(self, model, email="admin@gmail.com", password="123", firstName="admin", lastName="root", companyName=None, owner=None) -> bool:
+        
         exists = self.checkForEmail(email, model)
         if exists:
             return True
