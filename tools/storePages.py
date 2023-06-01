@@ -6,7 +6,7 @@ class Pages:
         self.name = name
         self.htmlFile = htmlFile
         
-    def create_page(self):
+    def createPage(self):
         @self.app.route(f'/{self.name}', methods=['GET', 'POST'])
         def page():
             return render_template(f'{self.htmlFile}')
