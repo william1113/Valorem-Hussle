@@ -1,6 +1,7 @@
+import re
 import json
 
-from flask import Flask, redirect, render_template, request, session, url_for
+from flask import Flask, redirect, render_template, request, session, url_for, flash
 from flask_login import LoginManager, login_required, logout_user, login_user
 
 from flask_session import Session
@@ -106,22 +107,27 @@ def registerCompany():
 
 #adds the user to the database
 
-@app.route("/addUser", methods=["POST"])
 
+def is_valid_email(email):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.[\w]+$'
+    return re.match(pattern, email)
+
+@app.route("/addUser", methods=["POST"])
 def registerUserProfile():
     firstName = request.form["firstname"]
     lastName = request.form["lastname"]
     email = request.form["email"]
     password = request.form["password"]
-    
-    res = db_manager.addUserToDB(User,email, password, firstName, lastName)
-    
-    if res:
-        user_ip = request.remote_addr
-        print(f"User: {email} just registerd successfully with IP: {user_ip}")
-        return redirect(url_for("login"))
-    return redirect(url_for("register/user", status="account already exists"))
-    
+    if is_valid_email(email):
+        res = db_manager.addUserToDB(User,email, password, firstName, lastName)
+        
+        if res:
+            user_ip = request.remote_addr
+            print(f"User: {email} just registerd successfully with IP: {user_ip}")
+            return redirect(url_for("login"))
+        return redirect(url_for("register/user", status="account already exists"))
+    flash("invalid email")
+    return redirect(url_for("register/user"))
 @app.route("/addCompany", methods=["POST"])
 def registerCompanyProfile():
     email = request.form["email"]
@@ -134,7 +140,10 @@ def registerCompanyProfile():
         return redirect(url_for("login"))
     else:
         return redirect(url_for("registerCompany", status="Company already exists"))
-    
+
+
+
+
 #searches with the help of search query and webscraper
 @app.route("/search", methods=["POST"])
 @login_required
