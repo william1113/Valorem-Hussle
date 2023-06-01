@@ -4,8 +4,12 @@ import os
 
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine
+from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import IntegrityError
 
 db = SQLAlchemy()
+
 
 # database table for storing user information
 class User(db.Model, UserMixin):
@@ -69,12 +73,11 @@ class DBManager:
             db.session.add(info)
             db.session.commit()
             return True
-        except CustomError as e:
-            print(e)
+        except IntegrityError:
             return False
     
     def updateData(self, CurrentEmail, model,**kwargs) -> bool:
-        user = model.query.filter_by(email=CurrentEmail.lower()).first()
+        user = model.query.filter_by(email=CurrentEmail).first()
         if user:
             for key, value in kwargs.items():
                 setattr(user, key, value)
@@ -98,13 +101,16 @@ class DBManager:
             return hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, hashAmount)
       
     def checkForEmail(self, email, model) -> bool:
-        user = model.query.filter_by(email=email.lower()).first()
-        if user is None:
+        try:
+            user = model.query.filter_by(email=email).first()
+            if user:
+                return True
             return False
-        return True
+        except NoResultFound:
+            return False
   
     def checkPassword(self, email, password, model):
-        user = model.query.filter_by(email=email.lower()).first()
+        user = model.query.filter_by(email=email).first()
         if user is None:
             return False
         hashed_password = self.hashPassword(password, user.salt, False)
