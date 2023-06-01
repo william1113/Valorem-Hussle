@@ -45,21 +45,47 @@ class DBManager:
         exists = self.checkForEmail(email, model)
         if exists:
             return True
-
+        # user_requierments = ["email", "password", "firstName", "lastName"]
         hashed_password, salt = self.hashPassword(password, None, True)
+        
         try:
             info = None
+            
             if model == User:
                 info = User(email=email, password=hashed_password, salt=salt, firstName=firstName, lastName=lastName)
             elif model == Company:
                 info = Company(email=email, password=hashed_password, salt=salt, companyName=companyName, owner=owner)
+            
+            """
+            if model == User:
+                for key, value in kwargs.items():
+                    setattr(User, key, value)
+            
+            setattr(User, "password", hashed_password)
+            setattr(User, "salt", salt)
+            """    
+            
+            
             db.session.add(info)
             db.session.commit()
             return True
         except CustomError as e:
             print(e)
             return False
-
+    
+    def updateData(self, CurrentEmail, model,**kwargs) -> bool:
+        user = model.query.filter_by(email=CurrentEmail.lower()).first()
+        if user:
+            for key, value in kwargs.items():
+                setattr(user, key, value)
+            try:
+                db.session.commit()
+                raise CustomError("Table not found")
+            except CustomError as e:
+                print(e)
+            
+            return True
+        return False
 
     def hashPassword(self, password, salt, newSalt=False):
         hashAmount = self.openConfigFile()["hashAmount"]
@@ -98,22 +124,11 @@ class DBManager:
         return user_data
         
         
-    def updateData(self, CurrentEmail, model,**kwargs) -> bool:
-        user = model.query.filter_by(email=CurrentEmail.lower()).first()
-        if user:
-            for key, value in kwargs.items():
-                setattr(user, key, value)
-            try:
-                if model == User:
-                    db.session.commit()
-                elif model == Company:
-                    db.session.commit()
-                raise CustomError("Model not found")
-            except:
-                pass
-            
-            return True
-        return False
+
+    
+    def deleteUser(self, email, model):
+        user = model.query.filter_by(email=email.lower()).first()
+        db.session.delete(user)
   
     def openConfigFile(self) -> dict:
         with open("./config.json", "r") as config_file:

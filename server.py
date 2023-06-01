@@ -79,12 +79,16 @@ def logout():
     return redirect(url_for("login"))
 
 #register new user page
-@app.route("/register", methods=["GET"])
-def register():
-    return render_template("register.html")
+@app.route("/register/user", methods=["GET"])
+def registerUser():
+    return render_template("registerUser.html")
+
+@app.route("/register/company", methods=["GET"])
+def registerCompany():
+    return render_template("registerCompany.html")
 
 #adds the user to the database
-@app.route("/addUser", methods=["POST", "GET"])
+@app.route("/addUser", methods=["POST"])
 def registerUserProfile():
     firstName = request.form["firstname"]
     lastName = request.form["lastname"]
@@ -95,6 +99,19 @@ def registerUserProfile():
 
     return redirect(url_for("login"))
 
+@app.route("/addCompany", methods=["POST"])
+def registerCompanyProfile():
+    email = request.form["email"]
+    password = request.form["password"]
+    owner = request.form["owner"]
+    companyName = request.form["companyName"]
+    
+    status = db_manager.addUserToDB(Company,email, password, owner, companyName)
+    if status:
+        return redirect(url_for("login"))
+    else:
+        return redirect(url_for("registerCompany", status="Company already exists"))
+    
 #searches with the help of search query and webscraper
 @app.route("/search", methods=["POST"])
 @login_required
@@ -113,6 +130,7 @@ def search():
 @app.route("/results/", methods=["GET", "POST"])
 @login_required
 def results():
+
     search_query = request.args.get("search_query")
     if search_query:
         session["search_query"] = search_query
@@ -121,7 +139,19 @@ def results():
         return render_template("results.html", data=data, search_query=search_query)
     else:
         return redirect(url_for("search"))
+    
+@app.route("/home", methods=["GET", "POST"])
+def home():
+    return render_template("home.html")
 
+@login_required
+@app.route("/updateprofile/", methods=["GET", "POST"])
+def updateprofile():
+    return render_template("updateprofile.html")
+
+@app.route("/updateProfileData/", methods=["GET", "POST"])
+def updateProfileData():
+    return redirect(url_for("updateprofile", data=session["firstName"]))
 
 # Create the store page
 Pages(app, 'kjell', "store1.html").createPage()
@@ -129,4 +159,4 @@ Pages(app, 'kjell', "store1.html").createPage()
 # Main entry point of the application
 if __name__ == "__main__":
     db_manager.init_app(app)
-    app.run(host="127.0.0.1", port=8080, debug=True)
+    app.run(host="127.0.0.1", port=5500)

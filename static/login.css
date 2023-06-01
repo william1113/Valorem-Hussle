@@ -1,0 +1,18 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+.login-inputs {
+display: flex;
+flex-direction: column;
+align-items: center;
+text-align: center;
+}
+
+.login-inputs input {
+margin-bottom: 10px;
+}
