@@ -30,9 +30,15 @@ Session(app)
 db_manager = DBManager()
 
 #error handel for error code 401
-@app.errorhandler(401)
+
+def handle_error(error):
+    error_code = getattr(error, 'code', 500)
+    return render_template("unauthorized.html", status = error_code)
+
+@app.errorhandler(Exception)
 def unauthorized(error):
-    return render_template('unauthorized.html'), 401
+    return handle_error(error)
+
 
 #loads the user through user id
 @login_manager.user_loader
@@ -159,4 +165,4 @@ Pages(app, 'kjell', "store1.html").createPage()
 # Main entry point of the application
 if __name__ == "__main__":
     db_manager.init_app(app)
-    app.run(host="127.0.0.1", port=5500)
+    app.run(host="127.0.0.1", port=5500, debug=True)
