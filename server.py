@@ -1,3 +1,5 @@
+import asyncio
+
 import re
 import json
 
@@ -8,7 +10,7 @@ from flask_session import Session
 from tools.storePages import Pages
 from tools.dbManger import DBManager, User, Company, db
 from tools.webscraper import graber
-
+from tools.validation import *
 app = Flask(__name__)
 
 
@@ -34,6 +36,9 @@ db_manager = DBManager()
 
 user_counter = 0
 #error handel for error code 401
+
+
+
 
 def handle_error(error):
     error_code = getattr(error, 'code', 500)
@@ -68,8 +73,7 @@ def index():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     #test user
-    db_manager.addUserToDB(User)
-    #----------------------------------------------------------------
+    db_manager.addUserToDB(User)    #----------------------------------------------------------------
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
@@ -97,49 +101,74 @@ def logout():
     return redirect(url_for("login"))
 
 #register new user page
-@app.route("/register/user", methods=["GET"])
+@app.route("/register-user", methods=["GET"])
 def registerUser():
     return render_template("registerUser.html")
+
+
+#adds the user to the database
+
+
+
+
+@app.route("/register/user-data", methods=["POST"])
+def registerUserProfile():
+
+    name = request.form["firstname"]
+    email = request.form["email"]
+    password = request.form["password"]
+    
+    validation_functions = { "email": (email,is_valid_email),
+    "password": (password,is_valid_password),
+    "Name": (name, is_valid_name)}
+    
+    validator: bool = False
+    
+    for value in validation_functions:
+        validator = validation_functions[value][1](validation_functions[value][0])
+        #print(validator, value)
+        if validator:
+            continue 
+        else:
+            validator = False
+            break
+
+    if validator:
+        res = db_manager.addUserToDB(User,email, password, name)
+        print("Result db check",res)
+        if res == False:
+            user_ip = request.remote_addr
+            
+            print(f"User: {email} just registerd successfully with IP: {user_ip}")
+            return redirect(url_for("login"))
+    print("here")
+    return redirect(url_for("registerUser", status=404))
 
 @app.route("/register/company", methods=["GET"])
 def registerCompany():
     return render_template("registerCompany.html")
 
-#adds the user to the database
-
-
-def is_valid_email(email):
-    pattern = r'^[\w\.-]+@[\w\.-]+\.[\w]+$'
-    return re.match(pattern, email)
-
-@app.route("/addUser", methods=["POST"])
-def registerUserProfile():
-    firstName = request.form["firstname"]
-    lastName = request.form["lastname"]
-    email = request.form["email"]
-    password = request.form["password"]
-    if is_valid_email(email):
-        res = db_manager.addUserToDB(User,email, password, firstName, lastName)
-        
-        if res:
-            user_ip = request.remote_addr
-            print(f"User: {email} just registerd successfully with IP: {user_ip}")
-            return redirect(url_for("login"))
-        return redirect(url_for("register/user", status="account already exists"))
-    flash("invalid email")
-    return redirect(url_for("register/user"))
-@app.route("/addCompany", methods=["POST"])
+@app.route("/register/company/data", methods=["POST"])
 def registerCompanyProfile():
     email = request.form["email"]
     password = request.form["password"]
     owner = request.form["owner"]
-    companyName = request.form["companyName"]
+    company_name = request.form["companyName"]
     
-    status = db_manager.addUserToDB(Company,email, password, owner, companyName)
-    if status:
-        return redirect(url_for("login"))
-    else:
-        return redirect(url_for("registerCompany", status="Company already exists"))
+    validation_functions = { "email": (email,is_valid_email),
+    "password": (password,is_valid_password),
+    "Name": (owner, is_valid_name),
+    "Company Name": (company_name,is_valid_company_name)}
+    
+    if any(func(value) for value, func in validation_functions.values()):
+    
+        status = db_manager.addUserToDB(Company,email, password, owner, company_name)
+        if status:
+            return redirect(url_for("login"))
+        else:
+            flash("Company already exists")
+            return redirect(url_for("registerCompany"))
+    return redirect(url_for("register/company"))
 
 
 
@@ -181,29 +210,12 @@ def home():
 def updateprofile():
     return render_template("updateprofile.html")
 
-@app.route("/updateProfileData/", methods=["POST"])
+@app.route("/updateProfileData/", methods=["GET","POST", "DELETE", "PUT"])
 def updateProfileData():
+    
     return redirect(url_for("updateprofile", data=session["firstName"]))
 
-# track amount of users on webapp
-def incrementUserCounter():
-    global user_counter
-    user_counter += 1
 
-def decrementUserCounter():
-    global user_counter
-    user_counter -= 1
-
-@app.before_request
-def before_request():
-    if "active" in session:
-        incrementUserCounter()
-
-@app.after_request
-def after_request(response):
-    if "active" in session:
-        decrementUserCounter()
-    return response
 
 # Create the store page
 Pages(app, 'kjell', "store1.html").createPage()

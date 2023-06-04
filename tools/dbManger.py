@@ -18,7 +18,6 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(256))
     salt = db.Column(db.String(1024))
     firstName = db.Column(db.String(50))
-    lastName = db.Column(db.String(50))
 
     def get_id(self):
         return str(self.id)
@@ -44,7 +43,7 @@ class DBManager:
             db.create_all()
     
             
-    def addUserToDB(self, model, email="admin@gmail.com", password="123", firstName="admin", lastName="root", companyName=None, owner=None) -> bool:
+    def addUserToDB(self, model, email="admin@gmail.com", password="123", firstName="admin", companyName=None, owner=None):
         
         exists = self.checkForEmail(email, model)
         if exists:
@@ -56,7 +55,7 @@ class DBManager:
             info = None
             
             if model == User:
-                info = User(email=email, password=hashed_password, salt=salt, firstName=firstName, lastName=lastName)
+                info = User(email=email, password=hashed_password, salt=salt, firstName=firstName)
             elif model == Company:
                 info = Company(email=email, password=hashed_password, salt=salt, companyName=companyName, owner=owner)
             
@@ -72,9 +71,9 @@ class DBManager:
             
             db.session.add(info)
             db.session.commit()
-            return True
+            return False 
         except IntegrityError:
-            return False
+            print(IntegrityError)
     
     def updateData(self, CurrentEmail, model,**kwargs) -> bool:
         user = model.query.filter_by(email=CurrentEmail).first()

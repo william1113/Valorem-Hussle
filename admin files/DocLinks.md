@@ -12,3 +12,6 @@ https://flask-login.readthedocs.io/en/latest/
 # md file syntax
 https://www.markdownguide.org/basic-syntax/ 
 
+
+# http error codes
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Status 

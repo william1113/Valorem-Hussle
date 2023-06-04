@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import json 
 import re
-
+import asyncio
 def unicodeChanger(arg):
     for index, indexValue in enumerate(arg):
         for key, value in indexValue.items():        
@@ -20,7 +20,7 @@ def unicodeChanger(arg):
             
     return arg 
 
-def graber(search):
+async def graber(search):
 
     search_engine_url = "https://www.amazon.se/s?k="  # Replace with the appropriate search engine URL
     url = search_engine_url + search
