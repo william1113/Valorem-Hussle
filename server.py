@@ -1,16 +1,15 @@
-import asyncio
-
-import re
 import json
 
-from flask import Flask, redirect, render_template, request, session, url_for, flash
-from flask_login import LoginManager, login_required, logout_user, login_user
+from flask import (Flask, flash, redirect, render_template, request, session,
+                   url_for)
+from flask_login import LoginManager, login_required, login_user, logout_user
 
 from flask_session import Session
+from tools.dbManger import Company, DBManager, User, db
 from tools.storePages import Pages
-from tools.dbManger import DBManager, User, Company, db
-from tools.webscraper import graber
 from tools.validation import *
+from tools.webscraper import graber
+
 app = Flask(__name__)
 
 
@@ -35,11 +34,7 @@ db_manager = DBManager()
 
 
 user_counter = 0
-#error handel for error code 401
-
-
-
-
+#error handeler
 def handle_error(error):
     error_code = getattr(error, 'code', 500)
     print(error_code)
@@ -102,41 +97,23 @@ def logout():
 
 #register new user page
 @app.route("/register-user", methods=["GET"])
-def registerUser():
+def register_user():
     return render_template("registerUser.html")
 
 
-#adds the user to the database
-
-
-
-
+#adds the user  to the database
 @app.route("/register/user-data", methods=["POST"])
-def registerUserProfile():
+def register_user_profile():
 
-    name = request.form["firstname"]
+    name = request.form["name"]
     email = request.form["email"]
     password = request.form["password"]
     
-    validation_functions = { "email": (email,is_valid_email),
-    "password": (password,is_valid_password),
-    "Name": (name, is_valid_name)}
-    
-    validator: bool = False
-    
-    for value in validation_functions:
-        validator = validation_functions[value][1](validation_functions[value][0])
-        #print(validator, value)
-        if validator:
-            continue 
-        else:
-            validator = False
-            break
 
-    if validator:
+    if validator(name=name, email=email, password=password):
         res = db_manager.addUserToDB(User,email, password, name)
         print("Result db check",res)
-        if res == False:
+        if res is False:
             user_ip = request.remote_addr
             
             print(f"User: {email} just registerd successfully with IP: {user_ip}")
@@ -145,11 +122,11 @@ def registerUserProfile():
     return redirect(url_for("registerUser", status=404))
 
 @app.route("/register/company", methods=["GET"])
-def registerCompany():
+def register_company():
     return render_template("registerCompany.html")
 
 @app.route("/register/company/data", methods=["POST"])
-def registerCompanyProfile():
+def register_company_profile():
     email = request.form["email"]
     password = request.form["password"]
     owner = request.form["owner"]
@@ -169,8 +146,6 @@ def registerCompanyProfile():
             flash("Company already exists")
             return redirect(url_for("registerCompany"))
     return redirect(url_for("register/company"))
-
-
 
 
 #searches with the help of search query and webscraper
@@ -214,8 +189,6 @@ def updateprofile():
 def updateProfileData():
     
     return redirect(url_for("updateprofile", data=session["firstName"]))
-
-
 
 # Create the store page
 Pages(app, 'kjell', "store1.html").createPage()

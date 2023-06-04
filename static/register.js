@@ -1,12 +1,22 @@
-window.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('registerUser');
-    const passwordInput = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirmPassword');
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const confirmationPassword = document.getElementById('confirmPassword');
+const submitButton = document.getElementById('submit');
+const passwordMatchIndicator = document.getElementById('passwordMatchIndicator')
 
-    form.addEventListener('submit', function(event) {
-        if (passwordInput.value !== confirmPasswordInput.value) {
-            event.preventDefault();
-            alert('Passwords do not match!');
-        }
-    });
-});
+const  checkPasswordMatch = () =>  {
+    if (passwordInput.value.length > 0 && passwordInput.value === confirmationPassword.value) {
+        submitButton.disabled = false;
+        passwordMatchIndicator.textContent = '✓';
+        passwordMatchIndicator.className = 'password-match';
+    } else {
+        submitButton.disabled = true;
+        passwordMatchIndicator.textContent = '✕';
+        passwordMatchIndicator.className = 'password-mismatch';
+    }
+};
+
+passwordInput.addEventListener('input', checkPasswordMatch);
+confirmationPassword.addEventListener('input', checkPasswordMatch);
+

@@ -8,16 +8,23 @@
     <title>Register new profile</title>
 </head>
 <body>
-    <script src="/static/register.js"></script>
     <form id="registerUser" action="/register/user-data" method="POST">
-        <input id="firstname" name="firstname" required/>
+        <label for="name" id="name">Full name</label>
+        <input id="name" name="name" required/>
         
+        <label for="email" id="email Label">Email</label>
         <input type="email" name="email" required/>
-        <input type="password" id="password" name="password" required/>
-        <input type="password" id="confirmPassword" name="confirmPassword" required/>
         
-        <button type="submit" name="submit">Confirm</button>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required/>
+        
+        <label for="confirmPassword">Confirm password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required/>
+        <span id="passwordMatchIndicator"></span>
+        
+        <button type="submit" id="submit" name="submit">Confirm</button>
     </form>
+    <script src="/static/register.js"></script>
     <p>{{status}}</p>
 </body>
 </html>

@@ -25,4 +25,22 @@ def is_valid_company_name(company_name):
         return True
     flash ("Invalid company name")
     return False
+
+def validator(**kwargs):
+    #print(kwargs)
+    validation_functions = { "email": (kwargs["email"],is_valid_email),
+    "password": (kwargs["password"],is_valid_password),
+    "Name": (kwargs["name"], is_valid_name)}
     
+    validator: bool = False
+    
+    for value in validation_functions:
+        validator = validation_functions[value][1](validation_functions[value][0])
+        print(validator, value)
+        if validator:
+            continue 
+        else:
+            validator = False
+            break
+    
+    return validator

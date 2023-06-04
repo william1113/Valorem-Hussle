@@ -1,0 +1,7 @@
+.password-match {
+    color: green;
+}
+
+.password-mismatch {
+    color: red;
+}
