@@ -1,0 +1,9 @@
+.item {
+    margin-bottom: 10px;
+}
+.name {
+    font-weight: bold;
+}
+.price {
+    color: green;
+}
