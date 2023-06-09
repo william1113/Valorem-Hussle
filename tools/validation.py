@@ -20,27 +20,35 @@ def is_valid_name(name):
     flash ("Invalid name")
     return False
 def is_valid_company_name(company_name):
-    pattern = r"^[A-Za-z0-9 ]+$"
-    if  re.match(pattern, company_name):
-        return True
-    flash ("Invalid company name")
-    return False
+    if company_name != False:
+        pattern = r"^[A-Za-z0-9 ]+$"
+        if  re.match(pattern, company_name):
+            return True
+        flash ("Invalid company name")
+        return False
 
-def validator(**kwargs):
+def validatorFunc(**kwargs):
     #print(kwargs)
     validation_functions = { "email": (kwargs["email"],is_valid_email),
     "password": (kwargs["password"],is_valid_password),
-    "Name": (kwargs["name"], is_valid_name)}
+    "Name": (kwargs["name"], is_valid_name),
+    "Company": (kwargs["company"], is_valid_company_name)}
     
     validator: bool = False
     
     for value in validation_functions:
-        validator = validation_functions[value][1](validation_functions[value][0])
-        print(validator, value)
-        if validator:
-            continue 
+        if validation_functions[value][0] != False:
+            validator = validation_functions[value][1](validation_functions[value][0])
+            print(validator, value)
+            if validator:
+                continue 
+            else:
+                validator = False
+                break
         else:
-            validator = False
-            break
+            print("here")
+            validator = True 
     
     return validator
+
+

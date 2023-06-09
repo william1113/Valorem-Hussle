@@ -6,37 +6,28 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/static/index.css"
-    <title>Valorem</title>
 
 </head>
 <body>
+    <h1>Valorem</h1>    
 <div class="first">
-    <h1>Valorem</h1>
     <div class="search-container">
-    <form id="searchForm" action="/search" method="POST">
-    
+    <form id="searchForm" action="/search" method="POST">    
         <input class="search-input" type="text" id="search_query" name="search_query" placeholder="Search Query">
-        <button type="submit">Search</button>
-        
+        <button type="submit">Search</button>      
     </form>
     </div>
     <div class="general-buttons">
-        <form action="/logout" method="POST">
-            <button type="submit">logout</button>
-        </form>
-
-<div class="main"></div>
-    <div class="firstForm">
-        <h1>Valorem</h1>
-        <form action="/results" method="POST">
-            <input type="text" name="search_query" placeholder="Search Query">
-            <button type="submit">Search</button>
-        </form>
-    </div>
-    <div class="secondForm">
-        <form action="/kjell">
-            <button type="submit">kjell</button>
-        </form>
+        <div class="form-logout"></div>
+            <form action="/logout" method="POST">
+                <button type="submit">logout</button>
+            </form>
+        </div>
+        <div class="secondForm">
+            <form action="/kjell">
+                <button type="submit">kjell</button>
+            </form>
+        </div>
     </div>
 </div>
 </body>

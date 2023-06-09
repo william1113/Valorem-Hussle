@@ -6,3 +6,34 @@
     height: auto;
 
 }
+
+h1{
+    font-family: Arial;
+    font-size: 55px;
+    color: darkgreen;
+    font-weight: 800;
+}
+
+h1{
+    align-items: center;
+    position: fixed;
+    padding-left: 750px;
+    padding-right: 1500px;
+    background-color: black;
+    background-size: cover;
+}
+
+form{
+    margin-top: 300px;
+}
+
+.general-buttons{
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-logout{
+    width: 100px;
+    height: 100px;
+    background-color: lightgray;
+}

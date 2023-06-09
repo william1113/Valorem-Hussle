@@ -8,16 +8,19 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 
+from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey
+
 db = SQLAlchemy()
 
 
 # database table for storing user information
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(50))
+    email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(256))
     salt = db.Column(db.String(1024))
-    firstName = db.Column(db.String(50))
+    name = db.Column(db.String(50))
 
     def get_id(self):
         return str(self.id)
@@ -25,14 +28,36 @@ class User(db.Model, UserMixin):
 # database table for storing the diffrent companies information
 class Company(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(50))
+    email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(256))
     salt = db.Column(db.String(1024))
     
-    companyName = db.Column(db.String(50))
+    company_name = db.Column(db.String(50), unique=True)
     owner = db.Column(db.String(50))
+
     
     activity = db.Column(db.Integer)
+
+    def get_id(self):
+        return str(self.id)
+    
+class CompanyProducts(db.Model):
+    __tablename__ = 'company_products'
+    id = db.Column(db.Integer, primary_key=True)
+    company_id = db.Column(db.Integer, ForeignKey('company.id'))
+    image_data = db.Column(db.String)
+    link = db.Column(db.String)
+    text = db.Column(db.String)
+    price = db.Column(db.String)
+    images = relationship('company', backref="products")
+    
+
+def add_data_to_model(model, data, salt, password):
+    info = model()
+    data["salt"], data["password"] = salt, password
+    for key, value in data.items():
+        setattr(info, key, value)
+    return info
 
 # all the database tools
 class DBManager:
@@ -43,32 +68,21 @@ class DBManager:
             db.create_all()
     
             
-    def addUserToDB(self, model, email="admin@gmail.com", password="123", firstName="admin", companyName=None, owner=None):
+    def addUserToDB(self, model, **kwargs):
         
-        exists = self.checkForEmail(email, model)
+        exists = self.checkForEmail(kwargs["email"], model)
         if exists:
             return True
         # user_requierments = ["email", "password", "firstName", "lastName"]
-        hashed_password, salt = self.hashPassword(password, None, True)
+        hashed_password, salt = self.hashPassword(kwargs["password"], None, True)
         
         try:
-            info = None
-            
+            info = None       
             if model == User:
-                info = User(email=email, password=hashed_password, salt=salt, firstName=firstName)
+                info = add_data_to_model(User, kwargs, salt, hashed_password)
+                print(info)
             elif model == Company:
-                info = Company(email=email, password=hashed_password, salt=salt, companyName=companyName, owner=owner)
-            
-            """
-            if model == User:
-                for key, value in kwargs.items():
-                    setattr(User, key, value)
-            
-            setattr(User, "password", hashed_password)
-            setattr(User, "salt", salt)
-            """    
-            
-            
+               info = add_data_to_model(Company, kwargs, salt, hashed_password)
             db.session.add(info)
             db.session.commit()
             return False 
@@ -146,3 +160,5 @@ class CustomError(Exception):
     
     def __str__(self) -> str:
         return f"Error: {self.message}"
+    
+

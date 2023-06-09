@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import json 
 import re
-import asyncio
+
 def unicodeChanger(arg):
     for index, indexValue in enumerate(arg):
         for key, value in indexValue.items():        
@@ -20,7 +20,7 @@ def unicodeChanger(arg):
             
     return arg 
 
-async def graber(search):
+def graber(search):
 
     search_engine_url = "https://www.amazon.se/s?k="  # Replace with the appropriate search engine URL
     url = search_engine_url + search
@@ -29,10 +29,9 @@ async def graber(search):
     html_content = response.content
     
     soup = BeautifulSoup(html_content, 'html.parser')
-
     product_names = soup.find_all('span', class_='a-size-base-plus a-color-base a-text-normal')
     product_prices = soup.find_all('span', class_='a-offscreen')
-
+  
     with open("./config.json", "r") as config_file:
         count = json.load(config_file)["count"]
 
@@ -48,4 +47,3 @@ async def graber(search):
         #print(price.text)
 
     return unicodeChanger(products)
-    

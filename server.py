@@ -2,14 +2,13 @@ import json
 
 from flask import (Flask, flash, redirect, render_template, request, session,
                    url_for)
-from flask_login import LoginManager, login_required, login_user, logout_user
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 
 from flask_session import Session
-from tools.dbManger import Company, DBManager, User, db
+from tools.dbManger import Company, DBManager, User, db, CompanyProducts
 from tools.storePages import Pages
-from tools.validation import *
+from tools.validation import validatorFunc
 from tools.webscraper import graber
-
 app = Flask(__name__)
 
 
@@ -56,7 +55,6 @@ def load_user(user_id):
     
 #main page for website
 @app.route("/", methods=["POST", "GET"])
-
 @login_required
 def index():
     if request.method == "POST":
@@ -68,25 +66,27 @@ def index():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     #test user
-    db_manager.addUserToDB(User)    #----------------------------------------------------------------
+    db_manager.addUserToDB(User, email="admin@gmail.com", password="admin", name="admin")
+    db_manager.addUserToDB(Company, email="root@gmail.com", password="root", owner="root", company_name ="root")    
     if request.method == "POST":
-        email = request.form["email"]
+        email = request.form["email"]                               
         password = request.form["password"]
         
         user = User.query.filter_by(email=email).first()
+ 
         if user is None:
             user = Company.query.filter_by(email=email).first()
+            
         
-        
-        if db_manager.checkPassword(email, password, User):
+        if db_manager.checkPassword(email, password, User) or db_manager.checkPassword(email, password, Company):
             login_user(user)  # Add this line to log in the user
             user_ip = request.remote_addr
             print(f"User: {user.email} just logged in successfully with IP: {user_ip}")
             return redirect(url_for("index"))
         else:
             return "Invalid email or password"
-
-    return render_template("login.html")
+    else:
+        return render_template("login.html")
 
 #creates the function so user can logout
 @app.route("/logout", methods=["POST"])
@@ -109,11 +109,12 @@ def register_user_profile():
     email = request.form["email"]
     password = request.form["password"]
     
+    print(validatorFunc(name=name, email=email, password=password, company=False),1000)
 
-    if validator(name=name, email=email, password=password):
-        res = db_manager.addUserToDB(User,email, password, name)
-        print("Result db check",res)
-        if res is False:
+    if validatorFunc(name=name, email=email, password=password, company=False):
+        status = db_manager.addUserToDB(User,email=email, password=password, name=name)
+
+        if status is False:
             user_ip = request.remote_addr
             
             print(f"User: {email} just registerd successfully with IP: {user_ip}")
@@ -127,19 +128,15 @@ def register_company():
 
 @app.route("/register/company/data", methods=["POST"])
 def register_company_profile():
+    
     email = request.form["email"]
     password = request.form["password"]
     owner = request.form["owner"]
     company_name = request.form["companyName"]
     
-    validation_functions = { "email": (email,is_valid_email),
-    "password": (password,is_valid_password),
-    "Name": (owner, is_valid_name),
-    "Company Name": (company_name,is_valid_company_name)}
+    if validatorFunc(email=email, password=password, name=owner, company=company_name):
     
-    if any(func(value) for value, func in validation_functions.values()):
-    
-        status = db_manager.addUserToDB(Company,email, password, owner, company_name)
+        status = db_manager.addUserToDB(Company,email=email, password=password, owner=owner, company_name=company_name)
         if status:
             return redirect(url_for("login"))
         else:
@@ -183,12 +180,39 @@ def home():
 @login_required
 @app.route("/updateprofile/", methods=["GET", "POST"])
 def updateprofile():
-    return render_template("updateprofile.html")
+    return render_template("profile.html")
 
-@app.route("/updateProfileData/", methods=["GET","POST", "DELETE", "PUT"])
+@app.route("/updateProfileData/", methods=["GET","POST"])
+@login_required
 def updateProfileData():
-    
-    return redirect(url_for("updateprofile", data=session["firstName"]))
+    image = request.files["image"].read()  # Read the image data from the uploaded file
+    link = request.form["link"]
+    text = request.form["text"]
+    price = request.form["price"]
+
+
+    # Check if a product with the provided criteria already exists
+    product = CompanyProducts.query.filter_by(link=link, text=text, price=price).first()
+
+    if product:
+        # If the product already exists, update its image
+        product.image_data = image
+    else:
+        # If the product doesn't exist, create a new instance and assign the values
+        product = CompanyProducts()
+        product.image_data = image
+        product.link = link
+        product.text = text
+        product.price = price
+
+        # Add the product to the session
+        db.session.add(product)
+
+    # Commit the changes to the database
+    db.session.commit()
+
+    return redirect(url_for("updateprofile"))
+
 
 # Create the store page
 Pages(app, 'kjell', "store1.html").createPage()

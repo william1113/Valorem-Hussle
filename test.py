@@ -1,10 +1,18 @@
-import asyncio
+class User:
+    id = None 
+    email =None 
 
-async def print_B(): #Simple async def
-    print("B")
 
-async def main_def():
-    print("A")
-    await asyncio.gather(print_B())
-    print("C")
-asyncio.run(main_def())
+
+def func (**kwargs):
+    info = User()
+
+    for key, value in kwargs.items():
+        setattr(info,key, value)
+   
+
+    print(info.email)
+    print(info.id)
+    
+
+func(email="test@test.com", id="1")
