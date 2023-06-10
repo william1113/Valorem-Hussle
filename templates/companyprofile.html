@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Welcome to your company profile</h1>
+
+    <h2>Company Details</h2>
+    <p>Company Name: {{ company.company_name }}</p>
+    <p>Owner: {{ company.owner }}</p>
+    
+    <h2>Products</h2>
+    {% if products %}
+      <table>
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Link</th>
+            <th>Text</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+          <tr>
+            <td><img src="data:image/png;base64,{{ product.image_data }}"></td>
+            <td>{{ product.link }}</td>
+            <td>{{ product.text }}</td>
+            <td>{{ product.price }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No products found.</p>
+    {% endif %}
+    
+    <h2>Add Product</h2>
+    <form action="{{ url_for('updateProfileData') }}" method="POST" enctype="multipart/form-data">
+      <input type="file" name="image">
+      <input type="text" name="price" placeholder="Price">
+      <input type="text" name="text" placeholder="Text">
+      <input type="text" name="link" placeholder="Link">
+      <input type="submit" value="Add Product">
+    </form>
+
+</body>
+</html>

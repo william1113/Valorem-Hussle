@@ -1,3 +1,4 @@
+import base64
 import json
 
 from flask import (Flask, flash, redirect, render_template, request, session,
@@ -24,7 +25,6 @@ app.config['SESSION_TYPE'] = 'filesystem'
 # Initialize Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
-
 # Configure Flask-Session
 Session(app)
 
@@ -66,6 +66,7 @@ def index():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     #test user
+    print(current_user)
     db_manager.addUserToDB(User, email="admin@gmail.com", password="admin", name="admin")
     db_manager.addUserToDB(Company, email="root@gmail.com", password="root", owner="root", company_name ="root")    
     if request.method == "POST":
@@ -80,8 +81,10 @@ def login():
         
         if db_manager.checkPassword(email, password, User) or db_manager.checkPassword(email, password, Company):
             login_user(user)  # Add this line to log in the user
+            session["email"] = user.email
             user_ip = request.remote_addr
             print(f"User: {user.email} just logged in successfully with IP: {user_ip}")
+    
             return redirect(url_for("index"))
         else:
             return "Invalid email or password"
@@ -137,7 +140,7 @@ def register_company_profile():
     if validatorFunc(email=email, password=password, name=owner, company=company_name):
     
         status = db_manager.addUserToDB(Company,email=email, password=password, owner=owner, company_name=company_name)
-        if status:
+        if status is False:
             return redirect(url_for("login"))
         else:
             flash("Company already exists")
@@ -180,31 +183,37 @@ def home():
 @login_required
 @app.route("/updateprofile/", methods=["GET", "POST"])
 def updateprofile():
-    return render_template("profile.html")
+    # Get the company details
+    company_details = Company.query.filter_by(email=session["email"]).first()
 
-@app.route("/updateProfileData/", methods=["GET","POST"])
+    # Get all products associated with the company
+    products = CompanyProducts.query.filter_by(company_id=company_details.id).all()
+    print(products)
+    return render_template("companyprofile.html", company=company_details, products=products)
+@app.route("/updateProfileData/", methods=["POST"])
 @login_required
 def updateProfileData():
     image = request.files["image"].read()  # Read the image data from the uploaded file
     link = request.form["link"]
     text = request.form["text"]
     price = request.form["price"]
-
-
+    #print(company_name)
+    image_data_base64 = base64.b64encode(image).decode('utf-8')
     # Check if a product with the provided criteria already exists
     product = CompanyProducts.query.filter_by(link=link, text=text, price=price).first()
-
+    companyDetails = Company.query.filter_by(email=session["email"]).first().id
+    
     if product:
         # If the product already exists, update its image
         product.image_data = image
     else:
         # If the product doesn't exist, create a new instance and assign the values
         product = CompanyProducts()
-        product.image_data = image
+        product.image_data = image_data_base64
         product.link = link
         product.text = text
         product.price = price
-
+        product.company_id = companyDetails 
         # Add the product to the session
         db.session.add(product)
 

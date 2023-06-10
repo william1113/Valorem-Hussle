@@ -4,7 +4,6 @@ import os
 
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import create_engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.exc import IntegrityError
 
@@ -16,6 +15,7 @@ db = SQLAlchemy()
 
 # database table for storing user information
 class User(db.Model, UserMixin):
+    __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(256))
@@ -27,6 +27,7 @@ class User(db.Model, UserMixin):
 
 # database table for storing the diffrent companies information
 class Company(db.Model, UserMixin):
+    __tablename__ = "companies"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(256))
@@ -42,14 +43,14 @@ class Company(db.Model, UserMixin):
         return str(self.id)
     
 class CompanyProducts(db.Model):
-    __tablename__ = 'company_products'
+    __tablename__ = "companies_products"
     id = db.Column(db.Integer, primary_key=True)
-    company_id = db.Column(db.Integer, ForeignKey('company.id'))
-    image_data = db.Column(db.String)
-    link = db.Column(db.String)
-    text = db.Column(db.String)
-    price = db.Column(db.String)
-    images = relationship('company', backref="products")
+    company_id = db.Column(db.Integer, ForeignKey('companies.id'))
+    image_data = db.Column(db.Text)
+    link = db.Column(db.String(200))
+    text = db.Column(db.String(100))
+    price = db.Column(db.String(200))
+   
     
 
 def add_data_to_model(model, data, salt, password):
@@ -138,8 +139,9 @@ class DBManager:
         if user is None:
             return {"status": False}
         
-        column_names = [desc['name'] for desc in user.__class__.query.column_descriptions]
+        column_names = [desc['name'] for desc in user.__class__.query.column_descriptions if desc['name'] != 'password' and desc['name'] != 'salt']
         user_data = {column_name : getattr(user, column_name) for column_name in column_names}
+        print(user_data)
         return user_data
         
         
